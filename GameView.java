@@ -155,7 +155,7 @@ public class GameView {
 
                 int choice = scan.nextInt()-1;
 
-                for (int i = 0; i < boards.board.size(); i++) {
+                 while (boards.board.size() != 0) {
                     int index = compare(boards.defBoard, player.hand.get(choice));
                     if (index != -1) {
                         boards.defBoard.remove(index);
