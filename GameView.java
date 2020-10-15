@@ -1,15 +1,13 @@
 package com.company.view;
 
-import com.company.model.Board;
-import com.company.model.Deck;
-import com.company.model.Player;
+import com.company.model.Creation;
 import com.company.service.Game;
 
 
-import java.util.Random;
 import java.util.Scanner;
 
-import static com.company.model.STATUS.*;
+import static com.company.model.STATUS.ATTACKER;
+import static com.company.model.STATUS.DEFENDER;
 import static com.company.service.Game.*;
 
 public class GameView {
@@ -17,168 +15,43 @@ public class GameView {
     private final static Scanner scan = new Scanner(System.in);
 
     public void Start() {
-        Deck deck = new Deck();
-
-        Board boards = new Board();
-
-        Player hand1 = new Player(deck);
-        Player hand2 = new Player(deck);
-
-        Random rnd = new Random();
-        int i = rnd.nextInt(2);
-        if (hand1.getId() == i)
-            hand1.status = ATTACK;
-        else hand2.status = ATTACK;
-
+        Creation game = new Creation();
+        Creation.handA.status = ATTACKER;
+        int command;
         do {
-            if (hand1.status == ATTACK) turn(hand1, hand2, boards);
-            else turn(hand2, hand1, boards);
-            if (hand1.status == ATTACK) getAdditionalCards(hand1, hand2, deck);
-            else getAdditionalCards(hand2, hand1, deck);
-        } while (Continue(hand1, hand2));
-        if (hand1.hand.size() == 0)  System.out.println("\nPlayer #" + hand1.getId() + " is winner");
-        else  System.out.println("\nPlayer #" + hand2.getId() + " is winner");
-    }
-
-    public static void turn(Player attacker, Player defender, Board boards) {
-        attacker.showCardsInHand();
-        boards.showCardsOnBoard();
-        addCard(attacker, boards);
-        while (boards.board.size() != 0) {
-            resetStatus(attacker, defender);
-            while (attacker.status != PASS) {
-                attacker.showCardsInHand();
-                boards.showCardsOnBoard();
-                addCard(attacker, boards);
+            if (Creation.handA.status == DEFENDER){
+                changeStatus(game);
             }
-            while ((defender.status != PASS) && (boards.defBoard.size() != 0)) {
-                defender.showCardsInHand();
-                boards.showCardsOnDefBoard();
-                defCard(defender, boards);
-            }
-        }
-        if (defender.status != PASS) resetStatus(defender, attacker);
-        else resetStatus(attacker, defender);
-    }
+            Game.showCardsInHand(Creation.handA);
+            System.out.println("Choose your cards to attack:");
+            System.out.println("Print '0', when you finish!");
+            command = scan.nextInt()-1;
+            do {
+                Creation.boards.defBoard.add(Creation.handA.hand.get(command));
+                put(Creation.handA.hand, Creation.boards.board, command);
+                Game.showCardsInHand(Creation.handA);
+                Game.showCardsOnBoard();
+                command = scan.nextInt()-1;
+            } while ((ifCanDoIt(Creation.handA, Creation.boards.board))&&(command != -1));
 
-    static void addCard(Player player, Board boards) {
-        if (boards.board.size() == 0) {
-            System.out.println("\nPlayer #" + player.getId() + " Choose a card");
-
-            int choice = scan.nextInt() - 1;
-
-            boards.defBoard.add(player.hand.get(choice));
-            put(player.hand, boards.board, choice);
-        } else {
-            if (player.status != ACTIV) {
-                System.out.println("\nPlayer #" + player.getId()
-                        + " Continue or pass? Enter 'C'ontinue or 'P'ass");
-
-                String userAnswer = scan.next();
-
-                switch (userAnswer.toUpperCase()) {
-
-                    case "C":
-                        System.out.println("Choose a card");
-                        int choice = scan.nextInt() - 1;
-                        for (int i = 0; i < boards.board.size(); i++) {
-                            if (player.hand.get(choice).getRank() == boards.board.get(i).getRank()) {
-                                boards.defBoard.add(player.hand.get(choice));
-                                put(player.hand, boards.board, choice);
-                                changeStatus(player);
-                                break;
-                            }
-                            if (i == boards.board.size()) {
-                                System.out.println("Incorrect input. Try again.");
-                                addCard(player, boards);
-                            }
-                        }
-                        break;
-
-                    case "P":
-                        boards.board.clear();
-                        pass(player);
-                        break;
-
-                    default:
-                        System.out.println("Incorrect input. Try again.");
-                        addCard(player, boards);
+            if (!Game.pass(command, game)) {
+                Game.showCardsInHand(Creation.handB);
+                Game.showCardsOnDefBoard();
+                System.out.println("Choose your cards to defend:");
+                System.out.println("Print '0', when you finish!");
+                command = scan.nextInt() - 1;
+                while ((Creation.boards.defBoard.size() != 0) && (command != -1)) {
+                    Game.compare(Creation.handB.hand.get(command), Creation.boards.defBoard);
+                    put(Creation.handB.hand, Creation.boards.board, command);
+                    Game.showCardsInHand(Creation.handB);
+                    Game.showCardsOnDefBoard();
+                    command = scan.nextInt() - 1;
                 }
-            } else if (!ifCanDoIt(player, boards)) {
-                pass(player);
-            } else {
-                System.out.println("\nPlayer #" + player.getId()
-                        + " Put one more card or enter. Enter 'C'ard or 'E'nter");
-
-                String userAnswer = scan.next();
-
-                switch (userAnswer.toUpperCase()) {
-
-                    case "C":
-                        System.out.println("Choose a card");
-                        int choice = scan.nextInt() - 1;
-                        for (int i = 0; i < boards.board.size(); i++) {
-                            if (player.hand.get(choice).getRank() == boards.board.get(i).getRank()) {
-                                boards.defBoard.add(player.hand.get(choice));
-                                put(player.hand, boards.board, choice);
-                                break;
-                            }
-                            if (i == boards.board.size()) {
-                                System.out.println("Incorrect input. Try again.");
-                                addCard(player, boards);
-                            }
-                        }
-                        break;
-
-                    case "E":
-                        pass(player);
-                        break;
-
-                    default:
-                        System.out.println("Incorrect input. Try again.");
-                        addCard(player, boards);
+                if (command == -1) {
+                    losing(Creation.handB, Creation.boards);
+                    Game.getAdditionalCards();
                 }
             }
-        }
-    }
-
-    static void defCard(Player player, Board boards) {
-        System.out.println("\nPlayer #" + player.getId()
-                + " Do you want to defend? 'Y'es or 'N'o");
-
-        String userAnswer = scan.next();
-
-        switch (userAnswer.toUpperCase()) {
-
-            case "Y":
-                System.out.println("Choose a card");
-
-                int choice = scan.nextInt()-1;
-
-                 while (boards.board.size() != 0) {
-                    int index = compare(boards.defBoard, player.hand.get(choice));
-                    if (index != -1) {
-                        boards.defBoard.remove(index);
-                        put(player.hand, boards.board, choice);
-                        break;
-                    }
-                }
-                break;
-
-            case "N":
-                for (int j = 0; j <= boards.board.size(); j++) {
-                    put(boards.board, player.hand, 0);
-                }
-                boards.defBoard.clear();
-                pass(player);
-                break;
-
-            default:
-                System.out.println("Incorrect input. Try again.");
-                defCard(player, boards);
-        }
+        } while (Continue(game));
     }
 }
-
-
-

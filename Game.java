@@ -1,28 +1,28 @@
 package com.company.service;
 
-import com.company.model.Board;
-import com.company.model.Card;
-import com.company.model.Deck;
-import com.company.model.Player;
+import com.company.model.*;
 
 import java.util.ArrayList;
 
-import static com.company.model.STATUS.*;
-
 public class Game {
 
-    public static boolean Continue(Player hand1, Player hand2) {
-        if (hand1.hand.size() == 0) return false;
-        if (hand2.hand.size() == 0) return false;
+    public static void showCardsInHand(Player player) {
+        System.out.println("\nCards of player #" + player.getStatus() + ": ");
+        for (Card c : player.hand) {
+            System.out.println(c.toString() + "; ");
+        }
+    }
+
+    public static boolean Continue(Creation game) {
+        if (game.handA.hand.size() == 0) return false;
+        if (game.handB.hand.size() == 0) return false;
         return true;
     }
 
-    public static boolean ifCanDoIt(Player player, Board boards) {
+    public static boolean ifCanDoIt(Player player, ArrayList<Card> board) {
         for (int i = 0; i < player.hand.size(); i++) {
-            for (int j = 0; j < boards.board.size(); j++) {
-                if (player.hand.get(i).getRank() == boards.board.get(j).getRank()) {
-                    boards.defBoard.add(player.hand.get(i));
-                    put(player.hand, boards.board, i);
+            for (int j = 0; j < board.size(); j++) {
+                if (player.hand.get(i).getRank() == board.get(j).getRank()) {
                     return true;
                 }
             }
@@ -35,32 +35,59 @@ public class Game {
         from.remove(choice);
     }
 
-    public static int compare(ArrayList<Card> defBoard, Card card) {
-        for (int index = 0; index < defBoard.size(); index++) {
+    public static void compare(Card card, ArrayList<Card> defBoard) {
+        int index;
+        for (index = 0; index < defBoard.size(); index++) {
             if ((card.getRank().getValue() > defBoard.get(index).getRank().getValue()) && (card.getSuit() == defBoard.get(index).getSuit())) {
-                return index;
+                defBoard.remove(index);
+                break;
             }
         }
-        return -1;
+        if (index == defBoard.size())
+            System.out.println("Too weak");
     }
 
-    public static void resetStatus(Player attacker, Player defender){
-        attacker.status = ATTACK;
-        defender.status = DEFEND;
+    public static void changeStatus(Creation game) {
+        game.handA.hand = game.hand;
+        Creation.handB.hand = Creation.handA.hand;
+        Creation.hand = Creation.handB.hand;
     }
 
-    public static void getAdditionalCards(Player player1, Player player2, Deck deck) {
-            while ((player1.hand.size() < 6) && (deck.index != deck.getSizeOfDeck()))
-                player1.hand.add(deck.drawFromDeck());
-            while ((player2.hand.size() < 6) && (deck.index != deck.getSizeOfDeck()))
-                player2.hand.add(deck.drawFromDeck());
-
+    public static void getAdditionalCards() {
+        while ((Creation.handA.hand.size() < 6) && (Creation.deck.index != Creation.deck.getSizeOfDeck()))
+            Creation.handA.hand.add(Creation.deck.drawFromDeck());
+        while ((Creation.handB.hand.size() < 6) && (Creation.deck.index != Creation.deck.getSizeOfDeck()))
+            Creation.handB.hand.add(Creation.deck.drawFromDeck());
     }
 
-    public static void pass(Player player) {
-        player.status = PASS;
+    public static void losing(Player player, Board boards) {
+        for (int j = 0; j <= boards.board.size(); j++) {
+            put(boards.board, player.hand, 0);
+        }
+        boards.defBoard.clear();
     }
-    public static void changeStatus(Player player) {
-        player.status = ACTIV;
+
+    public static boolean pass(int command, Creation game) {
+        if ((command == -1) && (Creation.boards.defBoard.size() == 0)) {
+            Game.getAdditionalCards();
+            game.handA.status = STATUS.DEFENDER;
+            game.handB.status = STATUS.ATTACKER;
+            return true;
+        }
+        return false;
+    }
+
+    public static void showCardsOnBoard() {
+        System.out.println("\nCards board : ");
+        for (Card c : Creation.boards.board) {
+            System.out.println(c.toString() + "; ");
+        }
+    }
+
+    public static void showCardsOnDefBoard() {
+        System.out.println("\nCards defBoard : ");
+        for (Card c : Creation.boards.defBoard) {
+            System.out.println(c.toString() + "; ");
+        }
     }
 }

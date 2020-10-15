@@ -5,11 +5,11 @@ import java.util.Random;
 
 public class Deck {
 
-    private ArrayList<Card> deck;
+    public ArrayList<Card> deck;
     public int index = 0;
 
     public Deck() {
-        deck = new ArrayList<Card>();
+        this.deck = new ArrayList<Card>();
         SUIT[] suit = SUIT.values();
         RANK[] rank = RANK.values();
 
