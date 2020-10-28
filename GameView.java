@@ -22,29 +22,29 @@ public class GameView {
             if (Creation.handA.status == DEFENDER){
                 changeStatus(game);
             }
-            Game.showCardsInHand(Creation.handA);
+            game.handA.showCardsInHand();
             System.out.println("Choose your cards to attack:");
             System.out.println("Print '0', when you finish!");
             command = scan.nextInt()-1;
             do {
                 Creation.boards.defBoard.add(Creation.handA.hand.get(command));
                 put(Creation.handA.hand, Creation.boards.board, command);
-                Game.showCardsInHand(Creation.handA);
-                Game.showCardsOnBoard();
+                game.handA.showCardsInHand();
+                game.boards.showCardsOnBoard();
                 command = scan.nextInt()-1;
-            } while ((ifCanDoIt(Creation.handA, Creation.boards.board))&&(command != -1));
+            } while ((ifCanDoIt(Creation.handA, Creation.boards.board, command))&&(command != -1));
 
             if (!Game.pass(command, game)) {
-                Game.showCardsInHand(Creation.handB);
-                Game.showCardsOnDefBoard();
+                game.handB.showCardsInHand();
+                game.boards.showCardsOnDefBoard();
                 System.out.println("Choose your cards to defend:");
                 System.out.println("Print '0', when you finish!");
                 command = scan.nextInt() - 1;
                 while ((Creation.boards.defBoard.size() != 0) && (command != -1)) {
                     Game.compare(Creation.handB.hand.get(command), Creation.boards.defBoard);
                     put(Creation.handB.hand, Creation.boards.board, command);
-                    Game.showCardsInHand(Creation.handB);
-                    Game.showCardsOnDefBoard();
+                    game.handB.showCardsInHand();
+                    game.boards.showCardsOnDefBoard();
                     command = scan.nextInt() - 1;
                 }
                 if (command == -1) {

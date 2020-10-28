@@ -19,6 +19,13 @@ public class Player {
     public STATUS getStatus() {
         return status;
     }
+
+    public void showCardsInHand() {
+        System.out.println("\nCards of player #" + this.getStatus() + ": ");
+        for (Card c : this.hand) {
+            System.out.println(c.toString() + "; ");
+        }
+    }
 }
 
 

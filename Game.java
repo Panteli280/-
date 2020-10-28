@@ -6,12 +6,7 @@ import java.util.ArrayList;
 
 public class Game {
 
-    public static void showCardsInHand(Player player) {
-        System.out.println("\nCards of player #" + player.getStatus() + ": ");
-        for (Card c : player.hand) {
-            System.out.println(c.toString() + "; ");
-        }
-    }
+
 
     public static boolean Continue(Creation game) {
         if (game.handA.hand.size() == 0) return false;
@@ -19,10 +14,10 @@ public class Game {
         return true;
     }
 
-    public static boolean ifCanDoIt(Player player, ArrayList<Card> board) {
+    public static boolean ifCanDoIt(Player player, ArrayList<Card> board, int command) {
         for (int i = 0; i < player.hand.size(); i++) {
             for (int j = 0; j < board.size(); j++) {
-                if (player.hand.get(i).getRank() == board.get(j).getRank()) {
+                if ((player.hand.get(i).getRank() == board.get(j).getRank())&&(i == command)) {
                     return true;
                 }
             }
@@ -38,13 +33,14 @@ public class Game {
     public static void compare(Card card, ArrayList<Card> defBoard) {
         int index;
         for (index = 0; index < defBoard.size(); index++) {
-            if ((card.getRank().getValue() > defBoard.get(index).getRank().getValue()) && (card.getSuit() == defBoard.get(index).getSuit())) {
+            if (index == defBoard.size()){
+                System.out.println("You can't do that");
+            break;
+        } else if ((card.getRank().getValue() > defBoard.get(index).getRank().getValue()) && (card.getSuit() == defBoard.get(index).getSuit())) {
                 defBoard.remove(index);
                 break;
             }
         }
-        if (index == defBoard.size())
-            System.out.println("Too weak");
     }
 
     public static void changeStatus(Creation game) {
@@ -75,19 +71,5 @@ public class Game {
             return true;
         }
         return false;
-    }
-
-    public static void showCardsOnBoard() {
-        System.out.println("\nCards board : ");
-        for (Card c : Creation.boards.board) {
-            System.out.println(c.toString() + "; ");
-        }
-    }
-
-    public static void showCardsOnDefBoard() {
-        System.out.println("\nCards defBoard : ");
-        for (Card c : Creation.boards.defBoard) {
-            System.out.println(c.toString() + "; ");
-        }
     }
 }

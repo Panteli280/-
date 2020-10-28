@@ -11,4 +11,18 @@ public class Board {
         this.board = new ArrayList<Card>();
         this.defBoard = new ArrayList<Card>();
     }
+
+    public void showCardsOnBoard() {
+        System.out.println("\nCards board : ");
+        for (Card c : this.board) {
+            System.out.println(c.toString() + "; ");
+        }
+    }
+
+    public void showCardsOnDefBoard() {
+        System.out.println("\nCards defBoard : ");
+        for (Card c : this.defBoard) {
+            System.out.println(c.toString() + "; ");
+        }
+    }
 }
