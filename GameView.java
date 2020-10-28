@@ -1,13 +1,13 @@
 package com.company.view;
 
+import com.company.model.Card;
 import com.company.model.Creation;
+import com.company.model.STATUS;
 import com.company.service.Game;
 
 
 import java.util.Scanner;
 
-import static com.company.model.STATUS.ATTACKER;
-import static com.company.model.STATUS.DEFENDER;
 import static com.company.service.Game.*;
 
 public class GameView {
@@ -16,39 +16,53 @@ public class GameView {
 
     public void Start() {
         Creation game = new Creation();
-        Creation.handA.status = ATTACKER;
+        Creation.hands.status = STATUS.ATOD;
         int command;
         do {
-            if (Creation.handA.status == DEFENDER){
+            if (Creation.hands.status == STATUS.DTOA){
                 changeStatus(game);
             }
-            game.handA.showCardsInHand();
+            game.hands.showCardsInHandA();
+            game.boards.showCardsOnBoard();
             System.out.println("Choose your cards to attack:");
             System.out.println("Print '0', when you finish!");
             command = scan.nextInt()-1;
-            do {
-                Creation.boards.defBoard.add(Creation.handA.hand.get(command));
-                put(Creation.handA.hand, Creation.boards.board, command);
-                game.handA.showCardsInHand();
-                game.boards.showCardsOnBoard();
-                command = scan.nextInt()-1;
-            } while ((ifCanDoIt(Creation.handA, Creation.boards.board, command))&&(command != -1));
+            while (command != -1) {
+                if (ifCanDoIt(Creation.hands.handA.get(command), Creation.boards.board)) {
+                    Creation.boards.defBoard.add(Creation.hands.handA.get(command));
+                    put(Creation.hands.handA, Creation.boards.board, command);
+                }
+                if (oneMoreCard(Creation.hands, Creation.boards.board)){
+                    game.hands.showCardsInHandA();
+                    game.boards.showCardsOnBoard();
+                    command = scan.nextInt()-1;
+                } else {
+                    break;
+                }
+            }
 
             if (!Game.pass(command, game)) {
-                game.handB.showCardsInHand();
+                game.hands.showCardsInHandB();
                 game.boards.showCardsOnDefBoard();
                 System.out.println("Choose your cards to defend:");
                 System.out.println("Print '0', when you finish!");
                 command = scan.nextInt() - 1;
-                while ((Creation.boards.defBoard.size() != 0) && (command != -1)) {
-                    Game.compare(Creation.handB.hand.get(command), Creation.boards.defBoard);
-                    put(Creation.handB.hand, Creation.boards.board, command);
-                    game.handB.showCardsInHand();
-                    game.boards.showCardsOnDefBoard();
-                    command = scan.nextInt() - 1;
+                while (command != -1) {
+                    int result = compare(Creation.hands.handB.get(command), Creation.boards.board);
+                    if (result != -1){
+                        Creation.boards.defBoard.remove(result);
+                        put(Creation.hands.handB, Creation.boards.board, command);
+                    }
+                    if (Creation.boards.defBoard.size() != 0){
+                        game.hands.showCardsInHandB();
+                        game.boards.showCardsOnDefBoard();
+                        command = scan.nextInt() - 1;
+                    } else {
+                        break;
+                    }
                 }
-                if (command == -1) {
-                    losing(Creation.handB, Creation.boards);
+                if (game.boards.defBoard.size() != 0) {
+                    losing(Creation.hands, Creation.boards);
                     Game.getAdditionalCards();
                 }
             }
