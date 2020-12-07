@@ -38,10 +38,11 @@ public class Game {
         return false;
     }
 
-    public static int compare(Card card, ArrayList<Card> defBoard) {
+    public static int compare(Card card, ArrayList<Card> defBoard, SUIT trump) {
         int index;
         for (index = 0; index < defBoard.size(); index++) {
-            if ((card.getRank().getValue() > defBoard.get(index).getRank().getValue() &&
+            if  ((card.getSuit() == trump)&&(defBoard.get(index).getSuit() != trump)||
+                    (card.getRank().getValue() > defBoard.get(index).getRank().getValue() &&
                     (card.getSuit() == defBoard.get(index).getSuit()))) {
                 return index;
             }
@@ -53,14 +54,6 @@ public class Game {
     public static void put(ArrayList<Card> from, ArrayList<Card> to, int choice) {
         to.add(from.get(choice));
         from.remove(choice);
-    }
-
-
-    public static void changeStatus(Creation game) {
-        game.hands.handA = game.hand;
-        Creation.hands.handB = Creation.hands.handA;
-        Creation.hand = Creation.hands.handB;
-        game.hands.status = STATUS.ATOD;
     }
 
     public static void getAdditionalCards() {
@@ -84,5 +77,12 @@ public class Game {
             return true;
         }
         return false;
+    }
+
+    public static void changeStatus(Creation game) {
+        game.hand = game.hands.handA;
+        Creation.hands.handA = Creation.hands.handB;
+        Creation.hands.handB = Creation.hand;
+        game.hands.status = STATUS.ATOD;
     }
 }

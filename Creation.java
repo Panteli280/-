@@ -10,8 +10,12 @@ public class Creation {
     public static Board boards;
     public static Players hands;
     public static ArrayList<Card> hand;
+    public static SUIT trump;
+    public static STATUS status;
 
     public Creation(){
+        this.status = STATUS.ATOD;
+        this.trump = SUIT.getTrump();
         this.deck = new Deck();
         this.boards = new Board();
 

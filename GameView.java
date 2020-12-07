@@ -1,6 +1,5 @@
 package com.company.view;
 
-import com.company.model.Card;
 import com.company.model.Creation;
 import com.company.model.STATUS;
 import com.company.service.Game;
@@ -16,10 +15,11 @@ public class GameView {
 
     public void Start() {
         Creation game = new Creation();
-        Creation.hands.status = STATUS.ATOD;
         int command;
+
         do {
-            if (Creation.hands.status == STATUS.DTOA){
+            System.out.println("The Trump is: " + game.trump);
+            if (game.status == STATUS.DTOA){
                 changeStatus(game);
             }
             game.hands.showCardsInHandA();
@@ -48,7 +48,7 @@ public class GameView {
                 System.out.println("Print '0', when you finish!");
                 command = scan.nextInt() - 1;
                 while (command != -1) {
-                    int result = compare(Creation.hands.handB.get(command), Creation.boards.board);
+                    int result = compare(Creation.hands.handB.get(command), Creation.boards.board, game.trump);
                     if (result != -1){
                         Creation.boards.defBoard.remove(result);
                         put(Creation.hands.handB, Creation.boards.board, command);
