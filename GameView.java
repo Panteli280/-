@@ -14,19 +14,26 @@ public class GameView {
     private final static Scanner scan = new Scanner(System.in);
 
     public void Start() {
-        Creation game = new Creation();
+        System.out.println("\nEnter the name of Player 1...\n");
+        String oneName = scan.nextLine();
+        System.out.println("\nEnter the name of Player 2...\n");
+        String twoName = scan.nextLine();
+
+        Creation game = new Creation(oneName, twoName);
         int command;
 
         do {
-            System.out.println("The Trump is: " + game.trump);
             if (game.status == STATUS.DTOA){
                 changeStatus(game);
             }
+            System.out.println("The Trump is: " + game.trump);
             game.hands.showCardsInHandA();
             game.boards.showCardsOnBoard();
-            System.out.println("Choose your cards to attack:");
+            System.out.println(game.hands.nameA + ", choose your cards to attack:");
             System.out.println("Print '0', when you finish!");
+
             command = scan.nextInt()-1;
+
             while (command != -1) {
                 if (ifCanDoIt(Creation.hands.handA.get(command), Creation.boards.board)) {
                     Creation.boards.defBoard.add(Creation.hands.handA.get(command));
@@ -42,9 +49,10 @@ public class GameView {
             }
 
             if (!Game.pass(command, game)) {
+                System.out.println("The Trump is: " + game.trump);
                 game.hands.showCardsInHandB();
                 game.boards.showCardsOnDefBoard();
-                System.out.println("Choose your cards to defend:");
+                System.out.println(game.hands.nameB + ", choose your cards to defend:");
                 System.out.println("Print '0', when you finish!");
                 command = scan.nextInt() - 1;
                 while (command != -1) {
@@ -67,5 +75,6 @@ public class GameView {
                 }
             }
         } while (Continue(game));
+
     }
 }

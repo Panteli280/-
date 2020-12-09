@@ -72,17 +72,22 @@ public class Game {
 
     public static boolean pass(int command, Creation game) {
         if ((command == -1) && (Creation.boards.defBoard.size() == 0)) {
+            game.boards.board.clear();
             Game.getAdditionalCards();
-            game.hands.status = STATUS.DTOA;
+            game.status = STATUS.DTOA;
             return true;
         }
         return false;
     }
 
     public static void changeStatus(Creation game) {
-        game.hand = game.hands.handA;
+        ArrayList<Card> handSwitcher = game.hands.handA;
         Creation.hands.handA = Creation.hands.handB;
-        Creation.hands.handB = Creation.hand;
-        game.hands.status = STATUS.ATOD;
+        Creation.hands.handB = handSwitcher;
+
+        String nameSwitcher = game.hands.nameA;
+        game.hands.nameA = game.hands.nameB;
+        game.hands.nameB = nameSwitcher;
+        game.status = STATUS.ATOD;
     }
 }
